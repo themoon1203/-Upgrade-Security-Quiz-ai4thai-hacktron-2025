@@ -1,14 +1,14 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  api1:
-    build: ./api1
+  gateway:
+    build: ./gateway
     ports:
       - "5000:5000"
     depends_on:
-      - api2
+      - message_processor
 
-  api2:
-    build: ./api2
+  message_processor:
+    build: ./message_processor
     ports:
       - "5001:5001"
