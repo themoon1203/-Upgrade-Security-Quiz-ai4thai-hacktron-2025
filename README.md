@@ -12,7 +12,7 @@
 ```
 ┌─────────────┐   HTTP + Auth   ┌──────────────────┐
 │             │ ──────────────► │                  │
-│   Gateway   │                │ Message Processor│
+│   Gateway   │                 │ Message Processor│
 │ (Port 5000) │ ◄────────────── │   (Port 5001)    │
 │             │   JSON Response │                  │
 └─────────────┘                 └──────────────────┘
@@ -82,7 +82,7 @@ Authorization: Bearer makemehappy
    cd -Upgrade-Security-Quiz-ai4thai-hacktron-2025
    ```
 
-2. **Build และ Run Services**
+2. **Build และ Run Services (บนโฟลเดอร์โปรเจกต์ ที่มีไฟล์ docker-compose.yml)**
    ```bash
    docker-compose up --build
    ```
@@ -179,21 +179,29 @@ python test.py
 ### ใช้ curl
 
 **ทดสอบ GET request:**
+
+ให้ทดสอบใน cmd (command prompt)
 ```bash
 curl -X GET http://localhost:5000/messages -H "Authorization: Bearer makemehappy"
 ```
 
 **ทดสอบ POST request พร้อม message:**
+
+ให้ทดสอบใน cmd (command prompt)
 ```bash
 curl -X POST http://localhost:5000/messages -H "Authorization: Bearer makemehappy" -H "Content-Type: application/json" -d "{\"message\": \"ทดสอบข้อความ\"}"
 ```
 
 **ทดสอบ POST request ไม่มี message:**
+
+ให้ทดสอบใน cmd (command prompt)
 ```bash
 curl -X POST http://localhost:5000/messages -H "Authorization: Bearer makemehappy" -H "Content-Type: application/json" -d "{}"
 ```
 
 **ทดสอบ Authentication ผิด:**
+
+ให้ทดสอบใน cmd (command prompt)
 ```bash
 curl -X POST http://localhost:5000/messages -H "Authorization: Bearer wrongtoken" -H "Content-Type: application/json"
 ```
@@ -261,35 +269,6 @@ colorlog
 - `request_id`: ID เฉพาะสำหรับแต่ละคำขอ (รูปแบบ: REQ-YYYYMMDDHHMMSS-XXX)
 - `timestamp`: Unix timestamp
 
-## 🔍 แก้ไขปัญหา
-
-### ปัญหาที่พบบ่อย
-
-1. **Authentication Error (403)**:
-   ```bash
-   # ตรวจสอบ token ให้ถูกต้อง
-   curl -H "Authorization: Bearer makemehappy" http://localhost:5000/messages
-   ```
-
-2. **Port conflicts**: 
-   ```bash
-   sudo lsof -i :5000
-   sudo lsof -i :5001
-   ```
-
-3. **Service ไม่ตอบสนอง**:
-   ```bash
-   docker-compose ps
-   docker-compose logs gateway
-   docker-compose logs message_processor
-   ```
-
-4. **Build ล้มเหลว**:
-   ```bash
-   docker-compose down
-   docker-compose up --build
-   ```
-
 ## 🚨 Security Features
 
 - **Bearer Token Authentication**: ป้องกันการเข้าถึงโดยไม่ได้รับอนุญาต
@@ -297,17 +276,6 @@ colorlog
 - **Request ID Tracking**: ติดตามและ audit การใช้งาน
 - **Input Validation**: ใช้ Pydantic สำหรับ validation
 - **Error Handling**: จัดการ error อย่างเหมาะสม
-
-## 🏆 บริบทของการแข่งขัน
-
-โปรเจกต์นี้พัฒนาสำหรับ **AI4Thai Hacktron 2025** เพื่อสาธิต:
-- Secure Microservices Architecture
-- Modern API Development กับ FastAPI
-- Authentication และ Authorization
-- Container Security Best Practices
-- Structured Logging และ Monitoring
-- API Gateway Pattern
-- Async HTTP Communication
 
 ## 🧪 Test Coverage
 
@@ -317,16 +285,3 @@ Test script ครอบคลุม:
 - ✅ GET request
 - ✅ Invalid token authentication
 - ✅ Async HTTP client testing
-
-## 👥 ทีม
-
-**ชื่อทีม:** Make me happy  
-**การแข่งขัน:** AI4Thai Hacktron 2025
-
-## 📄 สิทธิการใช้งาน
-
-โปรเจกต์นี้เป็นส่วนหนึ่งของการแข่งขัน AI4Thai Hacktron 2025
-
----
-
-*🔒 Built with Security & ❤️ by Team Make me happy*
