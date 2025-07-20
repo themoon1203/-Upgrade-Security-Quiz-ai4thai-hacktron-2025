@@ -2,11 +2,35 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import FastAPI, Request, HTTPException, Depends
 from httpx import AsyncClient
-from logging import basicConfig, getLogger, INFO
+from pydantic import BaseModel
+from colorlog import ColoredFormatter
+from logging import StreamHandler, basicConfig, getLogger, INFO
 
+
+getLogger('').handlers.clear()
 
 basicConfig(level=INFO)
 logger = getLogger('gateway')
+
+logger.handlers.clear()
+logger.propagate = False
+
+handler = StreamHandler()
+formatter = ColoredFormatter(
+    '%(log_color)s%(levelname)s:%(name)s:%(message)s',
+    log_colors={
+        'INFO': 'blue',
+        'WARNING': 'yellow',
+        'ERROR': 'red',
+        'CRITICAL': 'red,bg_white',
+    }
+)
+handler.setFormatter(formatter)
+logger.handlers = [handler]
+
+
+class Payloads(BaseModel):
+    message: str = 'Hello from make me happy'
 
 class Gateway(FastAPI):
     SECURITY = HTTPBearer()
@@ -26,11 +50,13 @@ class Gateway(FastAPI):
     def setup_route(self):
         @self.get('/messages')
         @self.post('/messages')
-        async def forward_message(request: Request, credentials: str = Depends(Gateway.verify_credential)):
+        async def forward_message(request: Request, payloads: Payloads = None, credentials: str = Depends(Gateway.verify_credential)):
             target_url = 'http://message_processor:5001/process'
             async with AsyncClient() as client:
                 if request.method == 'POST':
-                    payload = await request.json()
+                    body = await request.body()
+                    payload = await request.json() if 'message' in str(body) else {}
+
                     logger.info('Gateway: Received POST request from user with payload: %s' % (
                         payload
                     ))

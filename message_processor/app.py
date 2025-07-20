@@ -1,12 +1,31 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from datetime import datetime
-from logging import basicConfig, getLogger, INFO
+from colorlog import ColoredFormatter
+from logging import StreamHandler, basicConfig, getLogger, INFO
 from time import time
 
 
+getLogger('').handlers.clear()
+
 basicConfig(level=INFO)
 logger = getLogger('processor')
+
+logger.handlers.clear()
+logger.propagate = False
+
+handler = StreamHandler()
+formatter = ColoredFormatter(
+    '%(log_color)s%(levelname)s:%(name)s:%(message)s',
+    log_colors={
+        'INFO': 'yellow',
+        'WARNING': 'yellow',
+        'ERROR': 'red',
+        'CRITICAL': 'red,bg_white',
+    }
+)
+handler.setFormatter(formatter)
+logger.handlers = [handler]
 
 class MessageProcessor(FastAPI):
     def __init__(self):
